@@ -1,11 +1,19 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:args/args.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf_io.dart' as io;
 
 void main(List<String> arguments) {
+  var parser = ArgParser();
+  parser.addCommand('args');
+  var args = parser.parse(arguments).arguments;
+  if (args[0] != 'todolist') {
+    print("please run with 'todolist'");
+  }
+
   var app = Router();
   if (!File('data.json').existsSync()) {
     File('data.json').writeAsStringSync(json.encode([]));
