@@ -12,6 +12,7 @@ void main(List<String> arguments) {
   var args = parser.parse(arguments).arguments;
   if (args[0] != 'todolist') {
     print("please run with 'todolist'");
+    return;
   }
 
   var app = Router();
