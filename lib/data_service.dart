@@ -6,9 +6,7 @@ class JsonDataService implements IDataService {
   final _file = File('data.json');
 
   JsonDataService() {
-    if (!_file.existsSync()) {
-      _file.writeAsStringSync(json.encode([]));
-    }
+    if (!_file.existsSync()) _file.writeAsStringSync(json.encode([]));
     print('JSON database initialized');
   }
 
