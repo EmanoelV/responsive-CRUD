@@ -11,6 +11,7 @@ environment:
 
 dev_dependencies:
   pedantic: ^1.10.0
+  test: ^1.17.12
 dependencies: 
   args: ^2.3.0
   shelf: ^1.2.0

@@ -37,7 +37,7 @@ class Todolist {
             'Erro desconhecido, verifique o arquivo ${file.path} para mais detalhes.\n $e');
   }
 
-  FutureOr<Response> _getTasks(Request request) {
+  FutureOr<Response> getTasks(Request request) {
     try {
       return Response.ok(json.encode(_db.getAll()));
     } on FormatException catch (e) {
@@ -47,7 +47,7 @@ class Todolist {
     }
   }
 
-  FutureOr<Response> _createTask(Request request) async {
+  FutureOr<Response> createTask(Request request) async {
     try {
       final payload = json.decode(await request.readAsString());
       if (payload['title'] == null || payload['status'] == null) {
@@ -62,7 +62,7 @@ class Todolist {
     }
   }
 
-  FutureOr<Response> _updateTask(Request request) async {
+  FutureOr<Response> updateTask(Request request) async {
     try {
       final payload = json.decode(await request.readAsString());
       if (payload['id'] == null) return Response(400, body: 'id is null');
@@ -77,7 +77,7 @@ class Todolist {
     }
   }
 
-  FutureOr<Response> _deleteTask(Request request) async {
+  FutureOr<Response> deleteTask(Request request) async {
     try {
       final payload = json.decode(await request.readAsString());
       _db.delete("${payload['id']}");
@@ -93,10 +93,10 @@ class Todolist {
 
   Router get router {
     final router = Router();
-    router.get('/', _getTasks);
-    router.post('/', _createTask);
-    router.put('/', _updateTask);
-    router.delete('/', _deleteTask);
+    router.get('/', getTasks);
+    router.post('/', createTask);
+    router.put('/', updateTask);
+    router.delete('/', deleteTask);
     return router;
   }
 }
