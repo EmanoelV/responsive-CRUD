@@ -7,7 +7,9 @@ import 'package:simple_api_dart/data_service.dart';
 
 class Todolist {
   static const _header = {'Content-Type': 'application/json'};
-  final _db = JsonDataService();
+  final IDataService _db;
+
+  Todolist(this._db);
 
   Future<Response> _unknownError(Object e, Request request,
       [StackTrace? st]) async {
