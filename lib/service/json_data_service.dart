@@ -14,7 +14,7 @@ class JsonDataService implements IDataService {
   @override
   void create(Map<String, dynamic> item) {
     final data = getAll();
-    item['id'] = data.isEmpty ? 1 : data.last?['id'] + 1;
+    item['id'] = "${data.isEmpty ? 1 : int.parse(data.last?['id']) + 1}";
     item['createdAt'] = DateTime.now().toIso8601String();
     item['updatedAt'] = DateTime.now().toIso8601String();
     data.add(item);
@@ -48,6 +48,7 @@ class JsonDataService implements IDataService {
   @override
   void update(Map<String, dynamic> item) {
     final data = getAll();
+    item['id'] = item['id'].toString();
     if (data.isEmpty) throw NotFound('No data to update');
     final index = data.indexWhere((element) => element?['id'] == item['id']);
     if (index == -1) throw NotFound('Item not found');

@@ -25,24 +25,49 @@ void main() {
               {'title': 'test', 'status': 'open', 'extraItem': 'extra'})),
     ];
 
+    final goodPutRequests = [
+      Request('PUT', Uri.parse(path),
+          body: json.encode({'title': 'test2', 'id': '1'})),
+      Request('PUT', Uri.parse(path + '/1?page=1'),
+          body: json.encode({'title': 'test', 'id': 1})),
+      Request('PUT', Uri.parse(path + '/1'),
+          body: json.encode({
+            'title': 'test',
+            'status': 'open',
+            'extraItem': 'extra',
+            'id': '1'
+          })),
+    ];
+
     test('getTasks', () async {
       goodGetRequests.forEach((element) async {
         final response = await todolist.getTasks(element);
+        final responseBody = await response.readAsString();
         final responseIdealRequest =
             await (await todolist.getTasks(Request('GET', Uri.parse(path))))
                 .readAsString();
 
         expect(response.statusCode, equals(200));
-        expect(await response.readAsString(), isNotEmpty);
-        expect(await response.readAsString(), responseIdealRequest);
+        expect(responseBody, isNotEmpty);
+        expect(responseBody, responseIdealRequest);
       });
     });
 
     test('createTask', () async {
       goodPostRequests.forEach((element) async {
         final response = await todolist.createTask(element);
+        final responseBody = await response.readAsString();
         expect(response.statusCode, equals(201));
-        expect(await response.readAsString(), isNotEmpty);
+        expect(responseBody, isNotEmpty);
+      });
+    });
+
+    test('updateTask', () async {
+      goodPutRequests.forEach((element) async {
+        final response = await todolist.updateTask(element);
+        final responseBody = await response.readAsString();
+        expect(response.statusCode, equals(200));
+        expect(responseBody, isNotEmpty);
       });
     });
   });
