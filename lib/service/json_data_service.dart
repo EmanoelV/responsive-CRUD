@@ -1,6 +1,7 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
+import '../core/core.dart';
 
 class JsonDataService implements IDataService {
   final _file = File('data.json');
@@ -54,17 +55,4 @@ class JsonDataService implements IDataService {
     data[index]?.addAll(item);
     _file.writeAsStringSync(json.encode(data));
   }
-}
-
-abstract class IDataService {
-  FutureOr<List<Map<String, dynamic>?>> getAll({int? index, int? limit});
-  FutureOr<Map<String, dynamic>>? getByKey(String key);
-  FutureOr create(Map<String, dynamic> item);
-  FutureOr update(Map<String, dynamic> item);
-  FutureOr delete(String key);
-}
-
-class NotFound implements Exception {
-  final String message;
-  NotFound(this.message);
 }

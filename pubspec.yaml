@@ -15,4 +15,3 @@ dependencies:
   args: ^2.3.0
   shelf: ^1.2.0
   shelf_router: ^1.1.2
-  shelf_test_handler: ^2.0.0

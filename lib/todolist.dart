@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
-import 'package:simple_api_dart/data_service.dart';
+
+import 'core/core.dart';
 
 class Todolist {
   static const _header = {'Content-Type': 'application/json'};
@@ -35,63 +37,66 @@ class Todolist {
             'Erro desconhecido, verifique o arquivo ${file.path} para mais detalhes.\n $e');
   }
 
+  FutureOr<Response> _getTasks(Request request) {
+    try {
+      return Response.ok(json.encode(_db.getAll()));
+    } on FormatException catch (e) {
+      return Response(400, body: 'Invalid format: $e');
+    } catch (e, st) {
+      return _unknownError(e, request, st);
+    }
+  }
+
+  FutureOr<Response> _createTask(Request request) async {
+    try {
+      final payload = json.decode(await request.readAsString());
+      if (payload['title'] == null || payload['status'] == null) {
+        return Response(400, body: 'title or status is null');
+      }
+      _db.create(payload);
+      return Response(201, body: json.encode(payload), headers: _header);
+    } on FormatException catch (e) {
+      return Response(400, body: 'Invalid format: $e');
+    } catch (e, st) {
+      return _unknownError(e, request, st);
+    }
+  }
+
+  FutureOr<Response> _updateTask(Request request) async {
+    try {
+      final payload = json.decode(await request.readAsString());
+      if (payload['id'] == null) return Response(400, body: 'id is null');
+      _db.update(payload);
+      return Response.ok(json.encode(payload), headers: _header);
+    } on NotFound catch (e) {
+      return Response(400, body: e.message);
+    } on FormatException catch (e) {
+      return Response(400, body: 'Invalid format: $e');
+    } catch (e, st) {
+      return _unknownError(e, request, st);
+    }
+  }
+
+  FutureOr<Response> _deleteTask(Request request) async {
+    try {
+      final payload = json.decode(await request.readAsString());
+      _db.delete("${payload['id']}");
+      return Response.ok('Deleted');
+    } on NotFound catch (e) {
+      return Response(400, body: e.message);
+    } on FormatException catch (e) {
+      return Response(400, body: 'Invalid format: $e');
+    } catch (e, st) {
+      return await _unknownError(e, request, st);
+    }
+  }
+
   Router get router {
     final router = Router();
-
-    router.get('/', (Request request) {
-      try {
-        return Response.ok(json.encode(_db.getAll()));
-      } on FormatException catch (e) {
-        return Response(400, body: 'Invalid format: $e');
-      } catch (e, st) {
-        return _unknownError(e, request, st);
-      }
-    });
-
-    router.post('/', (Request request) async {
-      try {
-        final payload = json.decode(await request.readAsString());
-        if (payload['title'] == null || payload['status'] == null) {
-          return Response(400, body: 'title or status is null');
-        }
-        _db.create(payload);
-        return Response(201, body: json.encode(payload), headers: _header);
-      } on FormatException catch (e) {
-        return Response(400, body: 'Invalid format: $e');
-      } catch (e, st) {
-        return _unknownError(e, request, st);
-      }
-    });
-
-    router.put('/', (Request request) async {
-      try {
-        final payload = json.decode(await request.readAsString());
-        if (payload['id'] == null) return Response(400, body: 'id is null');
-        _db.update(payload);
-        return Response.ok(json.encode(payload), headers: _header);
-      } on NotFound catch (e) {
-        return Response(400, body: e.message);
-      } on FormatException catch (e) {
-        return Response(400, body: 'Invalid format: $e');
-      } catch (e, st) {
-        return _unknownError(e, request, st);
-      }
-    });
-
-    router.delete('/', (Request request) async {
-      try {
-        final payload = json.decode(await request.readAsString());
-        _db.delete("${payload['id']}");
-        return Response.ok('Deleted');
-      } on NotFound catch (e) {
-        return Response(400, body: e.message);
-      } on FormatException catch (e) {
-        return Response(400, body: 'Invalid format: $e');
-      } catch (e, st) {
-        return await _unknownError(e, request, st);
-      }
-    });
-
+    router.get('/', _getTasks);
+    router.post('/', _createTask);
+    router.put('/', _updateTask);
+    router.delete('/', _deleteTask);
     return router;
   }
 }

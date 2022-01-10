@@ -1,7 +1,7 @@
 import 'package:args/args.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf_io.dart' as io;
-import 'package:simple_api_dart/data_service.dart';
+import 'package:simple_api_dart/service/json_data_service.dart';
 import 'package:simple_api_dart/todolist.dart';
 
 void main(List<String> arguments) {
