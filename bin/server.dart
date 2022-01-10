@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:args/args.dart';
+import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:simple_api_dart/core/core.dart';
@@ -21,6 +24,17 @@ void main(List<String> arguments) {
     print('Specify one of these commands: todoist');
     return;
   }
+
+  app.options(
+      '/<cors|.*>',
+      (_) => Response(200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': '*',
+            'Access-Control-Allow-Headers': '*'
+          },
+          body: json.encode({'status': '200'})));
 
   io.serve(app, 'localhost', port).then((server) {
     print('Serving at http://${server.address.host}:${server.port}');

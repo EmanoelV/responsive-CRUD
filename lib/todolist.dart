@@ -8,7 +8,12 @@ import 'package:shelf_router/shelf_router.dart';
 import 'core/core.dart';
 
 class Todolist {
-  static const _header = {'Content-Type': 'application/json'};
+  static const _header = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': '*',
+    'Access-Control-Allow-Headers': '*'
+  };
   final IDataService _db;
 
   Todolist(this._db);
@@ -39,9 +44,9 @@ class Todolist {
 
   FutureOr<Response> getTasks(Request request) {
     try {
-      return Response.ok(json.encode(_db.getAll()));
+      return Response.ok(json.encode(_db.getAll()), headers: _header);
     } on FormatException catch (e) {
-      return Response(400, body: 'Invalid format: $e');
+      return Response(400, body: 'Invalid format: $e', headers: _header);
     } catch (e, st) {
       return _unknownError(e, request, st);
     }
