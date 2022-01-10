@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:shelf/shelf.dart';
 import 'package:simple_api_dart/core/core.dart';
@@ -7,6 +8,8 @@ import 'package:simple_api_dart/todolist.dart';
 import 'package:test/test.dart';
 
 void main() {
+  final file = File('data.json');
+  if (file.existsSync()) file.writeAsStringSync(json.encode([]));
   final todolist = Todolist(JsonDataService());
   final path = 'http://localhost:7777' + Config.todolistPath;
   group('Todolist', () {
