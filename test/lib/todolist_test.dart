@@ -12,13 +12,12 @@ void main() {
   group('Todolist', () {
     final goodGetRequests = [
       Request('GET', Uri.parse(path)),
-      Request('GET', Uri.parse(path + '?page=1'))
     ];
 
     final goodPostRequests = [
       Request('POST', Uri.parse(path),
           body: json.encode({'title': 'test', 'status': 'open'})),
-      Request('POST', Uri.parse(path + '?page=1'),
+      Request('POST', Uri.parse(path),
           body: json.encode({'title': 'test', 'status': 'open'})),
       Request('POST', Uri.parse(path),
           body: json.encode(
@@ -28,15 +27,20 @@ void main() {
     final goodPutRequests = [
       Request('PUT', Uri.parse(path),
           body: json.encode({'title': 'test2', 'id': '1'})),
-      Request('PUT', Uri.parse(path + '/1?page=1'),
+      Request('PUT', Uri.parse(path),
           body: json.encode({'title': 'test', 'id': 1})),
-      Request('PUT', Uri.parse(path + '/1'),
+      Request('PUT', Uri.parse(path),
           body: json.encode({
             'title': 'test',
             'status': 'open',
             'extraItem': 'extra',
             'id': '1'
           })),
+    ];
+
+    final goodDeleteRequests = [
+      Request('DELETE', Uri.parse(path), body: json.encode({'id': 1})),
+      Request('DELETE', Uri.parse(path), body: json.encode({'id': '2'})),
     ];
 
     test('getTasks', () async {
@@ -65,6 +69,15 @@ void main() {
     test('updateTask', () async {
       goodPutRequests.forEach((element) async {
         final response = await todolist.updateTask(element);
+        final responseBody = await response.readAsString();
+        expect(response.statusCode, equals(200));
+        expect(responseBody, isNotEmpty);
+      });
+    });
+
+    test('deleteTask', () async {
+      goodDeleteRequests.forEach((element) async {
+        final response = await todolist.deleteTask(element);
         final responseBody = await response.readAsString();
         expect(response.statusCode, equals(200));
         expect(responseBody, isNotEmpty);
