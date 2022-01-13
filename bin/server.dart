@@ -19,7 +19,7 @@ void main(List<String> arguments) {
   var port = args.length == 2 ? int.parse(args[1]) : 7777;
   var app = Router();
   if (args[0] == 'todolist') {
-    app.mount(Config.todolistPath, Todolist(JsonDataService()).router);
+    app.mount(Config.todolistPath, Todolist(Factory.dataService).router);
   } else {
     print('Specify one of these commands: todoist');
     return;
