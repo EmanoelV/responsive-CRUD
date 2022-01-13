@@ -39,7 +39,8 @@ class Todolist {
     file.writeAsStringSync(json.encode(log));
     return Response(500,
         body:
-            'Erro desconhecido, verifique o arquivo ${file.path} para mais detalhes.\n $e');
+            'Erro desconhecido, verifique o arquivo ${file.path} para mais detalhes.\n $e',
+        headers: _header);
   }
 
   FutureOr<Response> getTasks(Request request) {
@@ -56,12 +57,12 @@ class Todolist {
     try {
       final payload = json.decode(await request.readAsString());
       if (payload['title'] == null || payload['status'] == null) {
-        return Response(400, body: 'title or status is null');
+        return Response(400, body: 'title or status is null', headers: _header);
       }
       _db.create(payload);
       return Response(201, body: json.encode(payload), headers: _header);
     } on FormatException catch (e) {
-      return Response(400, body: 'Invalid format: $e');
+      return Response(400, body: 'Invalid format: $e', headers: _header);
     } catch (e, st) {
       return _unknownError(e, request, st);
     }
@@ -74,9 +75,9 @@ class Todolist {
       _db.update(payload);
       return Response.ok(json.encode(payload), headers: _header);
     } on NotFound catch (e) {
-      return Response(400, body: e.message);
+      return Response(400, body: e.message, headers: _header);
     } on FormatException catch (e) {
-      return Response(400, body: 'Invalid format: $e');
+      return Response(400, body: 'Invalid format: $e', headers: _header);
     } catch (e, st) {
       return _unknownError(e, request, st);
     }
@@ -86,11 +87,11 @@ class Todolist {
     try {
       final payload = json.decode(await request.readAsString());
       _db.delete("${payload['id']}");
-      return Response.ok('Deleted');
+      return Response.ok('Deleted', headers: _header);
     } on NotFound catch (e) {
-      return Response(400, body: e.message);
+      return Response(400, body: e.message, headers: _header);
     } on FormatException catch (e) {
-      return Response(400, body: 'Invalid format: $e');
+      return Response(400, body: 'Invalid format: $e', headers: _header);
     } catch (e, st) {
       return await _unknownError(e, request, st);
     }
