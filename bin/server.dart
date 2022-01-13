@@ -12,7 +12,7 @@ void main(List<String> arguments) {
   parser.addCommand('args');
   var args = parser.parse(arguments).arguments;
   if (args.isEmpty) {
-    print('Specify one of these commands: todoist');
+    print('Specify one of these commands: todolist');
     return;
   }
   var port = args.length == 2 ? int.parse(args[1]) : 7777;
@@ -20,7 +20,7 @@ void main(List<String> arguments) {
   if (args[0] == 'todolist') {
     app.mount(Config.todolistPath, Todolist(Factory.dataService).router);
   } else {
-    print('Specify one of these commands: todoist');
+    print('Specify one of these commands: todolist');
     return;
   }
 
