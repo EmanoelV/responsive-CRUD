@@ -56,9 +56,6 @@ class ResponsiveCrud {
   FutureOr<Response> createTask(Request request) async {
     try {
       final payload = json.decode(await request.readAsString());
-      if (payload['title'] == null || payload['status'] == null) {
-        return Response(400, body: 'title or status is null', headers: _header);
-      }
       _db.create(payload);
       return Response(201, body: json.encode(payload), headers: _header);
     } on FormatException catch (e) {
