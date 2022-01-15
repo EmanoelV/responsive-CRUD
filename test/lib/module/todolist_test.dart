@@ -15,6 +15,67 @@ void main() {
     file.writeAsStringSync(json.encode([]));
   }
 
+  group('Data Sanitization', () {
+    resetDatabase();
+    test('HTML tags sanitization in post', () async {
+      final response =
+          await todolist.createTask(Request('POST', Uri.parse(path),
+              body: json.encode({
+                'title': '<tagHtml>aaa</tagHtml>',
+                'status': '<script src="https://pepepi.popopo">ssss',
+                'extraItemUnic': '<script src="https://pepepi.popopo">',
+                '<>': '<>',
+                '&': '&'
+              })));
+      expect(response.statusCode, equals(201));
+      final responseGet =
+          await todolist.getTasks(Request('GET', Uri.parse(path)));
+      final responseGetJson = json.decode(await responseGet.readAsString());
+      expect(responseGet.statusCode, equals(200));
+      final Map<String, dynamic> responseItem = responseGetJson
+          .firstWhere((element) => element['extraItemUnic'] != null);
+      expect(
+          responseItem['title'], equals('&lt;tagHtml&gt;aaa&lt;/tagHtml&gt;'));
+      expect(responseItem['status'],
+          equals('&lt;script src="https://pepepi.popopo"&gt;ssss'));
+      expect(responseItem['extraItemUnic'],
+          equals('&lt;script src="https://pepepi.popopo"&gt;'));
+      expect(responseItem.keys.toList()[3], equals('&lt;&gt;'));
+      expect(responseItem.keys.toList()[4], equals('&amp;'));
+      expect(responseItem['&lt;&gt;'], equals('&lt;&gt;'));
+      expect(responseItem['&amp;'], equals('&amp;'));
+    });
+
+    test('HTML tags sanitization in put', () async {
+      final response = await todolist.updateTask(Request('PUT', Uri.parse(path),
+          body: json.encode({
+            'id': '1',
+            'title': '<tagHtml>aaa</tagHtml>',
+            'status': '<script src="https://pepepi.popopo">ssss',
+            'extraItemUnic': '<script src="https://pepepi.popopo">',
+            '<>': '<>',
+            '&': '&'
+          })));
+      expect(response.statusCode, equals(200));
+      final responseGet =
+          await todolist.getTasks(Request('GET', Uri.parse(path)));
+      final responseGetJson = json.decode(await responseGet.readAsString());
+      expect(responseGet.statusCode, equals(200));
+      final Map<String, dynamic> responseItem = responseGetJson
+          .firstWhere((element) => element['extraItemUnic'] != null);
+      expect(
+          responseItem['title'], equals('&lt;tagHtml&gt;aaa&lt;/tagHtml&gt;'));
+      expect(responseItem['status'],
+          equals('&lt;script src="https://pepepi.popopo"&gt;ssss'));
+      expect(responseItem['extraItemUnic'],
+          equals('&lt;script src="https://pepepi.popopo"&gt;'));
+      expect(responseItem.keys.toList()[3], equals('&lt;&gt;'));
+      expect(responseItem.keys.toList()[4], equals('&amp;'));
+      expect(responseItem['&lt;&gt;'], equals('&lt;&gt;'));
+      expect(responseItem['&amp;'], equals('&amp;'));
+    });
+  });
+
   group('Todolist requests', () {
     resetDatabase();
     final goodGetRequests = [
@@ -89,39 +150,6 @@ void main() {
         expect(response.statusCode, equals(200));
         expect(responseBody, isNotEmpty);
       });
-    });
-  });
-
-  group('Data Sanitization', () {
-    resetDatabase();
-
-    test('HTML tags sanitization', () async {
-      final response =
-          await todolist.createTask(Request('POST', Uri.parse(path),
-              body: json.encode({
-                'title': '<tagHtml>aaa</tagHtml>',
-                'status': '<script src="https://pepepi.popopo">ssss',
-                'extraItemUnic': '<script src="https://pepepi.popopo">',
-                '<>': '<>',
-                '&': '&'
-              })));
-      expect(response.statusCode, equals(201));
-      final responseGet =
-          await todolist.getTasks(Request('GET', Uri.parse(path)));
-      final responseGetJson = json.decode(await responseGet.readAsString());
-      expect(responseGet.statusCode, equals(200));
-      final Map<String, dynamic> responseItem = responseGetJson
-          .firstWhere((element) => element['extraItemUnic'] != null);
-      expect(
-          responseItem['title'], equals('&lt;tagHtml&gt;aaa&lt;/tagHtml&gt;'));
-      expect(responseItem['status'],
-          equals('&lt;script src="https://pepepi.popopo"&gt;ssss'));
-      expect(responseItem['extraItemUnic'],
-          equals('&lt;script src="https://pepepi.popopo"&gt;'));
-      expect(responseItem.keys.toList()[3], equals('&lt;&gt;'));
-      expect(responseItem.keys.toList()[4], equals('&amp;'));
-      expect(responseItem['&lt;&gt;'], equals('&lt;&gt;'));
-      expect(responseItem['&amp;'], equals('&amp;'));
     });
   });
 }

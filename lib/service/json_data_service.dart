@@ -49,12 +49,14 @@ class JsonDataService implements IDataService {
   @override
   void update(Map<String, dynamic> item) {
     final data = getAll();
-    item['id'] = item['id'].toString();
+    final sanitizedItem = json.decode(json.encode(item).sanitize);
+    sanitizedItem['id'] = sanitizedItem['id'].toString();
     if (data.isEmpty) throw NotFound('No data to update');
-    final index = data.indexWhere((element) => element?['id'] == item['id']);
+    final index =
+        data.indexWhere((element) => element?['id'] == sanitizedItem['id']);
     if (index == -1) throw NotFound('Item not found');
-    item['updatedAt'] = DateTime.now().toIso8601String();
-    data[index]?.addAll(item);
+    sanitizedItem['updatedAt'] = DateTime.now().toIso8601String();
+    data[index]?.addAll(sanitizedItem);
     _file.writeAsStringSync(json.encode(data));
   }
 }
