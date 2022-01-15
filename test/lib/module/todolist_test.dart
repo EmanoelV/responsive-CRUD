@@ -3,11 +3,11 @@ import 'dart:io';
 
 import 'package:shelf/shelf.dart';
 import 'package:simple_api_dart/core/core.dart';
-import 'package:simple_api_dart/module/todolist.dart';
+import 'package:simple_api_dart/module/responsive_crud.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final todolist = Todolist(Factory.dataService);
+  final todolist = ResponsiveCrud(Factory.dataService);
   final path = 'http://localhost:7777' + Config.todolistPath;
 
   void resetDatabase() {

@@ -5,7 +5,7 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:simple_api_dart/core/core.dart';
-import 'package:simple_api_dart/module/todolist.dart';
+import 'package:simple_api_dart/module/responsive_crud.dart';
 
 void main(List<String> arguments) {
   var parser = ArgParser();
@@ -17,8 +17,8 @@ void main(List<String> arguments) {
   }
   var port = args.length == 2 ? int.parse(args[1]) : 7777;
   var app = Router();
-  if (args[0] == 'todolist') {
-    app.mount(Config.todolistPath, Todolist(Factory.dataService).router);
+  if (args[0] == 'crud') {
+    app.mount(Config.todolistPath, ResponsiveCrud(Factory.dataService).router);
   } else {
     print('Specify one of these commands: todolist');
     return;

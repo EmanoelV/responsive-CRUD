@@ -7,7 +7,7 @@ import 'package:shelf_router/shelf_router.dart';
 
 import '../core/core.dart';
 
-class Todolist {
+class ResponsiveCrud {
   static const _header = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
@@ -16,7 +16,7 @@ class Todolist {
   };
   final IDataService _db;
 
-  Todolist(this._db);
+  ResponsiveCrud(this._db);
 
   Future<Response> _unknownError(Object e, Request request,
       [StackTrace? st]) async {
