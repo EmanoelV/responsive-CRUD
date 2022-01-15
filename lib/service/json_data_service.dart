@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import '../core/core.dart';
 
 class JsonDataService implements IDataService {
@@ -14,10 +13,12 @@ class JsonDataService implements IDataService {
   @override
   void create(Map<String, dynamic> item) {
     final data = getAll();
-    item['id'] = "${data.isEmpty ? 1 : int.parse(data.last?['id']) + 1}";
-    item['createdAt'] = DateTime.now().toIso8601String();
-    item['updatedAt'] = DateTime.now().toIso8601String();
-    data.add(item);
+    final sanitizedItem = json.decode(json.encode(item).sanitize);
+    sanitizedItem['id'] =
+        "${data.isEmpty ? 1 : int.parse(data.last?['id']) + 1}";
+    sanitizedItem['createdAt'] = DateTime.now().toIso8601String();
+    sanitizedItem['updatedAt'] = DateTime.now().toIso8601String();
+    data.add(sanitizedItem);
     _file.writeAsStringSync(json.encode(data));
   }
 

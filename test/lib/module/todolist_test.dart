@@ -3,16 +3,20 @@ import 'dart:io';
 
 import 'package:shelf/shelf.dart';
 import 'package:simple_api_dart/core/core.dart';
-import 'package:simple_api_dart/service/json_data_service.dart';
 import 'package:simple_api_dart/module/todolist.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final file = File('data.json');
-  if (file.existsSync()) file.writeAsStringSync(json.encode([]));
-  final todolist = Todolist(JsonDataService());
+  final todolist = Todolist(Factory.dataService);
   final path = 'http://localhost:7777' + Config.todolistPath;
-  group('Todolist', () {
+
+  void resetDatabase() {
+    final file = File('data.json');
+    file.writeAsStringSync(json.encode([]));
+  }
+
+  group('Todolist requests', () {
+    resetDatabase();
     final goodGetRequests = [
       Request('GET', Uri.parse(path)),
     ];
@@ -85,6 +89,39 @@ void main() {
         expect(response.statusCode, equals(200));
         expect(responseBody, isNotEmpty);
       });
+    });
+  });
+
+  group('Data Sanitization', () {
+    resetDatabase();
+
+    test('HTML tags sanitization', () async {
+      final response =
+          await todolist.createTask(Request('POST', Uri.parse(path),
+              body: json.encode({
+                'title': '<tagHtml>aaa</tagHtml>',
+                'status': '<script src="https://pepepi.popopo">ssss',
+                'extraItemUnic': '<script src="https://pepepi.popopo">',
+                '<>': '<>',
+                '&': '&'
+              })));
+      expect(response.statusCode, equals(201));
+      final responseGet =
+          await todolist.getTasks(Request('GET', Uri.parse(path)));
+      final responseGetJson = json.decode(await responseGet.readAsString());
+      expect(responseGet.statusCode, equals(200));
+      final Map<String, dynamic> responseItem = responseGetJson
+          .firstWhere((element) => element['extraItemUnic'] != null);
+      expect(
+          responseItem['title'], equals('&lt;tagHtml&gt;aaa&lt;/tagHtml&gt;'));
+      expect(responseItem['status'],
+          equals('&lt;script src="https://pepepi.popopo"&gt;ssss'));
+      expect(responseItem['extraItemUnic'],
+          equals('&lt;script src="https://pepepi.popopo"&gt;'));
+      expect(responseItem.keys.toList()[3], equals('&lt;&gt;'));
+      expect(responseItem.keys.toList()[4], equals('&amp;'));
+      expect(responseItem['&lt;&gt;'], equals('&lt;&gt;'));
+      expect(responseItem['&amp;'], equals('&amp;'));
     });
   });
 }
