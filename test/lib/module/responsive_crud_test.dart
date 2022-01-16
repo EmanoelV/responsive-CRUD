@@ -76,7 +76,7 @@ void main() {
     });
   });
 
-  group('Todolist requests', () {
+  group('Crud requests', () {
     resetDatabase();
     final goodGetRequests = [
       Request('GET', Uri.parse(path)),
@@ -111,7 +111,7 @@ void main() {
       Request('DELETE', Uri.parse(path), body: json.encode({'id': '2'})),
     ];
 
-    test('getTasks', () async {
+    test('GET', () async {
       goodGetRequests.forEach((element) async {
         final response = await todolist.getTasks(element);
         final responseBody = await response.readAsString();
@@ -125,7 +125,7 @@ void main() {
       });
     });
 
-    test('createTask', () async {
+    test('POST', () async {
       goodPostRequests.forEach((element) async {
         final response = await todolist.createTask(element);
         final responseBody = await response.readAsString();
@@ -134,7 +134,7 @@ void main() {
       });
     });
 
-    test('updateTask', () async {
+    test('PUT', () async {
       goodPutRequests.forEach((element) async {
         final response = await todolist.updateTask(element);
         final responseBody = await response.readAsString();
@@ -143,7 +143,7 @@ void main() {
       });
     });
 
-    test('deleteTask', () async {
+    test('DELETE', () async {
       goodDeleteRequests.forEach((element) async {
         final response = await todolist.deleteTask(element);
         final responseBody = await response.readAsString();
