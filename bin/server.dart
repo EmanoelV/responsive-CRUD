@@ -12,15 +12,15 @@ void main(List<String> arguments) {
   parser.addCommand('args');
   var args = parser.parse(arguments).arguments;
   if (args.isEmpty) {
-    print('Specify one of these commands: todolist');
+    print('Specify one of these commands: crud');
     return;
   }
   var port = args.length == 2 ? int.parse(args[1]) : 7777;
   var app = Router();
   if (args[0] == 'crud') {
-    app.mount(Config.todolistPath, ResponsiveCrud(Factory.dataService).router);
+    app.mount('/', ResponsiveCrud(Factory.dataService).router);
   } else {
-    print('Specify one of these commands: todolist');
+    print('Specify one of these commands: crud');
     return;
   }
 

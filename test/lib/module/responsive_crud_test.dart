@@ -8,7 +8,7 @@ import 'package:test/test.dart';
 
 void main() {
   final todolist = ResponsiveCrud(Factory.dataService);
-  final path = 'http://localhost:7777' + Config.todolistPath;
+  final path = 'http://localhost:7777/';
 
   void resetDatabase() {
     final file = File('data.json');
